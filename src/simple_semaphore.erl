@@ -11,6 +11,7 @@
   register_worker/3,
   done/2,
   change_max_tasks/2,
+  current_tasks/1,
   stop/1
 ]).
 
@@ -18,7 +19,7 @@
   max_tasks :: pos_integer(),
   tasks :: ets:tid(),
   workers :: ets:tid(),
-  current_tasks = 0 :: integer()
+  current_tasks = 0 :: non_neg_integer()
 }).
 
 -type task_ref()::term().
@@ -55,6 +56,10 @@ done(Pid, TaskRef) ->
 change_max_tasks(Pid, NewMaxTasks) ->
   gen_server:call(Pid, {change_max_tasks, NewMaxTasks}).
 
+-spec current_tasks(pid()) -> {ok, non_neg_integer()}.
+current_tasks(Pid) ->
+  gen_server:call(Pid, current_tasks).
+
 -spec stop(pid()) -> term().
 stop(Pid) ->
   gen_server:stop(Pid).
@@ -88,6 +93,8 @@ handle_call({done, TaskRef}, _From, St) ->
   {reply, ok, NewSt};
 handle_call({change_max_tasks, NewMaxTasks}, _From, St) ->
   {reply, ok, St#st{max_tasks = NewMaxTasks}};
+handle_call(current_tasks, _From, #st{current_tasks = CurrentTasks} = St) ->
+  {reply, {ok, CurrentTasks}, St};
 handle_call(Msg, _From, St) ->
   {stop, {unknown_call, Msg}, St}.
 
