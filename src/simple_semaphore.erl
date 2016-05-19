@@ -10,6 +10,7 @@
   new_task/1,
   register_worker/3,
   done/2,
+  change_max_tasks/2,
   stop/1
 ]).
 
@@ -50,6 +51,10 @@ register_worker(Pid, TaskRef, WorkerPid) ->
 done(Pid, TaskRef) ->
   gen_server:call(Pid, {done, TaskRef}).
 
+-spec change_max_tasks(pid(), pos_integer()) -> ok.
+change_max_tasks(Pid, NewMaxTasks) ->
+  gen_server:call(Pid, {change_max_tasks, NewMaxTasks}).
+
 -spec stop(pid()) -> term().
 stop(Pid) ->
   gen_server:stop(Pid).
@@ -81,6 +86,8 @@ handle_call({register_worker, TaskRef, WorkerPid}, _From, St) ->
 handle_call({done, TaskRef}, _From, St) ->
   NewSt = do_done(TaskRef, St),
   {reply, ok, NewSt};
+handle_call({change_max_tasks, NewMaxTasks}, _From, St) ->
+  {reply, ok, St#st{max_tasks = NewMaxTasks}};
 handle_call(Msg, _From, St) ->
   {stop, {unknown_call, Msg}, St}.
 
