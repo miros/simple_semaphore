@@ -36,31 +36,31 @@ start_link(Name, MaxTasks) ->
 start_link(MaxTasks) ->
   gen_server:start_link(?MODULE, [MaxTasks], []).
 
--spec new_task(pid(), pid()) -> {ok, task_ref()} | {error, limit_reached}.
+-spec new_task(pid() | atom(), pid()) -> {ok, task_ref()} | {error, limit_reached}.
 new_task(Pid, WorkerPid) ->
   gen_server:call(Pid, {new_task, WorkerPid}).
 
--spec new_task(pid()) -> {ok, task_ref()} | {error, limit_reached}.
+-spec new_task(pid() | atom()) -> {ok, task_ref()} | {error, limit_reached}.
 new_task(Pid) ->
   new_task(Pid, self()).
 
--spec register_worker(pid(), task_ref(), pid()) -> ok.
+-spec register_worker(pid() | atom(), task_ref(), pid()) -> ok.
 register_worker(Pid, TaskRef, WorkerPid) ->
   gen_server:call(Pid, {register_worker, TaskRef, WorkerPid}).
 
--spec done(pid(), task_ref()) -> ok.
+-spec done(pid() | atom(), task_ref()) -> ok.
 done(Pid, TaskRef) ->
   gen_server:call(Pid, {done, TaskRef}).
 
--spec change_max_tasks(pid(), pos_integer()) -> ok.
+-spec change_max_tasks(pid() | atom(), pos_integer()) -> ok.
 change_max_tasks(Pid, NewMaxTasks) ->
   gen_server:call(Pid, {change_max_tasks, NewMaxTasks}).
 
--spec current_tasks(pid()) -> {ok, non_neg_integer()}.
+-spec current_tasks(pid() | atom()) -> {ok, non_neg_integer()}.
 current_tasks(Pid) ->
   gen_server:call(Pid, current_tasks).
 
--spec stop(pid()) -> term().
+-spec stop(pid() | atom()) -> term().
 stop(Pid) ->
   gen_server:stop(Pid).
 
